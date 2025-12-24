@@ -7,7 +7,7 @@ name = "mcp-agent-mail"
 version = "0.1.0"
 description = "Coordinated multi-agent messaging and coordination MCP server."
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 license = { text = "MIT" }
 authors = [
   { name = "mcp-agent-mail maintainers" },
@@ -108,7 +108,7 @@ known-first-party = ["mcp_agent_mail"]
 combine-as-imports = true
 
 [tool.mypy]
-python_version = "3.14"
+python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

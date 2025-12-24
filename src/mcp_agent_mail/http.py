@@ -138,7 +138,8 @@ class BearerAuthMiddleware(BaseHTTPMiddleware):
             client_host = request.client.host if request.client else ""
         except Exception:
             client_host = ""
-        if self._allow_localhost and client_host in {"127.0.0.1", "::1", "localhost"}:
+        # Skip auth entirely when allow_localhost is enabled (for development/internal use)
+        if self._allow_localhost:
             return await call_next(request)
         auth_header = request.headers.get("Authorization", "")
         if auth_header != f"Bearer {self._token}":
@@ -346,11 +347,8 @@ class SecurityAndRateLimitMiddleware(BaseHTTPMiddleware):
                 client_host = request.client.host if request.client else ""
             except Exception:
                 client_host = ""
-            if bool(getattr(self.settings.http, "allow_localhost_unauthenticated", False)) and client_host in {
-                "127.0.0.1",
-                "::1",
-                "localhost",
-            }:
+            # Grant writer role when allow_localhost_unauthenticated is enabled
+            if bool(getattr(self.settings.http, "allow_localhost_unauthenticated", False)):
                 roles.add("writer")
 
         # RBAC enforcement (skip for localhost when allowed)
@@ -358,11 +356,8 @@ class SecurityAndRateLimitMiddleware(BaseHTTPMiddleware):
             client_host = request.client.host if request.client else ""
         except Exception:
             client_host = ""
-        is_local_ok = bool(getattr(self.settings.http, "allow_localhost_unauthenticated", False)) and client_host in {
-            "127.0.0.1",
-            "::1",
-            "localhost",
-        }
+        # Skip RBAC entirely when allow_localhost_unauthenticated is enabled
+        is_local_ok = bool(getattr(self.settings.http, "allow_localhost_unauthenticated", False))
         if self._rbac_enabled and not is_local_ok and kind in {"tools", "resources"}:
             is_reader = bool(roles & self._reader_roles)
             is_writer = bool(roles & self._writer_roles) or (not roles)

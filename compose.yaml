@@ -3,14 +3,20 @@ services:
     build: .
     environment:
       HTTP_HOST: "0.0.0.0"
+      HTTP_PORT: "8766"
+      HTTP_BEARER_TOKEN: "${HTTP_BEARER_TOKEN:-}"
+      HTTP_ALLOW_LOCALHOST_UNAUTHENTICATED: "${HTTP_ALLOW_LOCALHOST_UNAUTHENTICATED:-true}"
       STORAGE_ROOT: "/data/mailbox"
+      DATABASE_URL: "sqlite+aiosqlite:////data/storage.sqlite3"
       LOG_RICH_ENABLED: "true"
+      FILE_RESERVATIONS_ENFORCEMENT_ENABLED: "true"
+      CONTACT_ENFORCEMENT_ENABLED: "false"
+      LLM_ENABLED: "false"
     ports:
-      - "8765:8765"
+      - "8766:8766"
     volumes:
-      - agent_mail_data:/data
+      # Mount local storage directory
+      - ./data:/data
       # Optional: mount a local .env file (read-only) for config
       - ./.env:/app/.env:ro
-volumes:
-  agent_mail_data:
 
